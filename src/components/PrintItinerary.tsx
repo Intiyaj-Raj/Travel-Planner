@@ -1,4 +1,4 @@
-import { TripData } from "../types/trip";
+import { TripData } from '../types/trip';
 import {
   CATEGORY_META,
   addDaysToIsoDate,
@@ -10,7 +10,7 @@ import {
   formatShortDate,
   haversineKm,
   parseTimeToMinutes,
-} from "../utils/travel";
+} from '../utils/travel';
 
 interface PrintItineraryProps {
   trip: TripData;
@@ -24,12 +24,12 @@ export function PrintItinerary({ trip }: PrintItineraryProps) {
       : addDaysToIsoDate(trip.startDate, 0);
 
   const totalBudget = trip.categoryBudgets.reduce(
-    (s, c) => s + convertCurrency(c.limitUsd, "USD", trip.displayCurrency),
-    0,
+    (s, c) => s + convertCurrency(c.limitUsd, 'USD', trip.displayCurrency),
+    0
   );
   const totalLogged = trip.expenses.reduce(
     (s, e) => s + convertCurrency(e.amount, e.currency, trip.displayCurrency),
-    0,
+    0
   );
 
   return (
@@ -47,15 +47,15 @@ export function PrintItinerary({ trip }: PrintItineraryProps) {
           <span>·</span>
           <span>
             {formatShortDate(trip.startDate)}
-            {trip.days.length > 1 ? ` – ${formatShortDate(endDate)}` : ""}
+            {trip.days.length > 1 ? ` – ${formatShortDate(endDate)}` : ''}
           </span>
           <span>·</span>
           <span>
-            {trip.travelers} {trip.travelers === 1 ? "traveler" : "travelers"}
+            {trip.travelers} {trip.travelers === 1 ? 'traveler' : 'travelers'}
           </span>
           <span>·</span>
           <span className="font-mono">
-            Budget: {formatMoney(totalLogged, trip.displayCurrency)} /{" "}
+            Budget: {formatMoney(totalLogged, trip.displayCurrency)} /{' '}
             {formatMoney(totalBudget, trip.displayCurrency)}
           </span>
         </div>
@@ -101,12 +101,9 @@ export function PrintItinerary({ trip }: PrintItineraryProps) {
                         place.lat,
                         place.lng,
                         nextPlace.lat,
-                        nextPlace.lng,
+                        nextPlace.lng
                       );
-                      legMin = estimateTravelMinutes(
-                        legKm,
-                        stop.travelModeToNext,
-                      );
+                      legMin = estimateTravelMinutes(legKm, stop.travelModeToNext);
                     }
                     cursor = endMin + legMin;
 
@@ -114,7 +111,7 @@ export function PrintItinerary({ trip }: PrintItineraryProps) {
                       <div key={stop.id} className="text-xs">
                         <div className="flex items-baseline justify-between gap-4">
                           <div className="font-semibold text-slate-900">
-                            {sIdx + 1}. {place.name}{" "}
+                            {sIdx + 1}. {place.name}{' '}
                             <span className="font-normal text-slate-500">
                               ({CATEGORY_META[place.category].label})
                             </span>
@@ -133,8 +130,8 @@ export function PrintItinerary({ trip }: PrintItineraryProps) {
                         )}
                         {nextPlace && (
                           <div className="mt-1.5 pl-4 font-mono text-[10px] text-slate-500">
-                            ↳ Travel to next stop: ~{legMin} min{" "}
-                            {stop.travelModeToNext} ({formatDistance(legKm)})
+                            ↳ Travel to next stop: ~{legMin} min {stop.travelModeToNext} (
+                            {formatDistance(legKm)})
                           </div>
                         )}
                       </div>
@@ -156,14 +153,11 @@ export function PrintItinerary({ trip }: PrintItineraryProps) {
           <div className="grid grid-cols-2 gap-4 text-xs">
             {trip.packingGroups.map((g) => (
               <div key={g.id}>
-                <div className="font-semibold text-slate-900 mb-1">
-                  {g.title}
-                </div>
+                <div className="font-semibold text-slate-900 mb-1">{g.title}</div>
                 <ul className="space-y-0.5 text-slate-700">
                   {g.items.map((item) => (
                     <li key={item.id}>
-                      [{item.checked ? "x" : " "}] {item.label} (x
-                      {item.quantity})
+                      [{item.checked ? 'x' : ' '}] {item.label} (x{item.quantity})
                     </li>
                   ))}
                 </ul>

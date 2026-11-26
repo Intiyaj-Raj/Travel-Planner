@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
 import {
   AppView,
   BudgetCategoryId,
@@ -9,9 +9,9 @@ import {
   Place,
   TravelMode,
   TripData,
-} from "./types/trip";
-import { SAMPLE_TRIP, createBlankTrip } from "./data/mockTrip";
-import { addDaysToIsoDate } from "./utils/travel";
+} from './types/trip';
+import { SAMPLE_TRIP, createBlankTrip } from './data/mockTrip';
+import { addDaysToIsoDate } from './utils/travel';
 import {
   decodeSharePayload,
   encodeSharePayload,
@@ -19,46 +19,42 @@ import {
   exportTripToJson,
   importIcsIntoTrip,
   validateAndParseTripJson,
-} from "./utils/exportImport";
-import { TopBar } from "./components/TopBar";
-import { SavedPlacesPanel } from "./components/SavedPlacesPanel";
-import { DayPlanner } from "./components/DayPlanner";
-import { MapCanvas } from "./components/MapCanvas";
-import { BudgetTracker } from "./components/BudgetTracker";
-import { PackingManager } from "./components/PackingManager";
-import { ShareView } from "./components/ShareView";
-import { PrintItinerary } from "./components/PrintItinerary";
-import { AddPlaceModal, TripSettingsModal } from "./components/Modals";
+} from './utils/exportImport';
+import { TopBar } from './components/TopBar';
+import { SavedPlacesPanel } from './components/SavedPlacesPanel';
+import { DayPlanner } from './components/DayPlanner';
+import { MapCanvas } from './components/MapCanvas';
+import { BudgetTracker } from './components/BudgetTracker';
+import { PackingManager } from './components/PackingManager';
+import { ShareView } from './components/ShareView';
+import { PrintItinerary } from './components/PrintItinerary';
+import { AddPlaceModal, TripSettingsModal } from './components/Modals';
 
-const RELEASE_DAY = Math.min(
-  3,
-  Math.max(1, Number(import.meta.env.VITE_RELEASE_DAY || 3)),
-);
-const ENABLED_VIEWS: AppView[] =
-  RELEASE_DAY === 1
-    ? ["itinerary"]
-    : RELEASE_DAY === 2
-      ? ["itinerary", "budget"]
-      : ["itinerary", "budget", "packing", "share"];
+const RELEASE_DAY = Math.min(3, Math.max(1, Number(import.meta.env.VITE_RELEASE_DAY || 3)));
+const ENABLED_VIEWS: AppView[] = RELEASE_DAY === 1
+  ? ['itinerary']
+  : RELEASE_DAY === 2
+    ? ['itinerary', 'budget']
+    : ['itinerary', 'budget', 'packing', 'share'];
 
-const STORAGE_TRIP_KEY = "wayfinder_trip_v1";
-const STORAGE_THEME_KEY = "wayfinder_theme_v2";
+const STORAGE_TRIP_KEY = 'wayfinder_trip_v1';
+const STORAGE_THEME_KEY = 'wayfinder_theme_v2';
 
 function resolveInitialRoute(): {
   view: AppView;
   sharedTrip: TripData | null;
 } {
-  const path = window.location.pathname.replace(/\/+$/, "") || "/";
+  const path = window.location.pathname.replace(/\/+$/, '') || '/';
   const params = new URLSearchParams(window.location.search);
-  const encodedTrip = params.get("trip");
+  const encodedTrip = params.get('trip');
 
-  if (path === "/share") {
+  if (path === '/share') {
     const decoded = encodedTrip ? decodeSharePayload(encodedTrip) : null;
-    return { view: "share", sharedTrip: decoded };
+    return { view: 'share', sharedTrip: decoded };
   }
-  if (path === "/budget") return { view: "budget", sharedTrip: null };
-  if (path === "/packing") return { view: "packing", sharedTrip: null };
-  return { view: "itinerary", sharedTrip: null };
+  if (path === '/budget') return { view: 'budget', sharedTrip: null };
+  if (path === '/packing') return { view: 'packing', sharedTrip: null };
+  return { view: 'itinerary', sharedTrip: null };
 }
 
 function loadSavedTrip(): TripData {
@@ -76,24 +72,22 @@ export default function App() {
 
   const [trip, setTrip] = useState<TripData>(loadSavedTrip);
   const [sharedTrip, setSharedTrip] = useState<TripData | null>(
-    initialRoute.sharedTrip,
+    initialRoute.sharedTrip
   );
   const [activeView, setActiveView] = useState<AppView>(initialRoute.view);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     try {
-      return localStorage.getItem(STORAGE_THEME_KEY) === "dark";
+      return localStorage.getItem(STORAGE_THEME_KEY) === 'dark';
     } catch {
       return false;
     }
   });
 
   const [selectedDayId, setSelectedDayId] = useState<string | null>(
-    () => trip.days[0]?.id || null,
+    () => trip.days[0]?.id || null
   );
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
-  const [mobilePane, setMobilePane] = useState<"places" | "schedule" | "map">(
-    "schedule",
-  );
+  const [mobilePane, setMobilePane] = useState<'places' | 'schedule' | 'map'>('schedule');
 
   const [tripSettingsOpen, setTripSettingsOpen] = useState(false);
   const [addPlaceCoords, setAddPlaceCoords] = useState<{
@@ -102,10 +96,9 @@ export default function App() {
   } | null>(null);
   const [addPlaceModalOpen, setAddPlaceModalOpen] = useState(false);
 
-  const [toast, setToast] = useState<{
-    message: string;
-    isError?: boolean;
-  } | null>(null);
+  const [toast, setToast] = useState<{ message: string; isError?: boolean } | null>(
+    null
+  );
 
   const showToast = useCallback((message: string, isError = false) => {
     setToast({ message, isError });
@@ -119,9 +112,9 @@ export default function App() {
 
   // Sync dark mode class on <html>
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", darkMode);
+    document.documentElement.classList.toggle('dark', darkMode);
     try {
-      localStorage.setItem(STORAGE_THEME_KEY, darkMode ? "dark" : "light");
+      localStorage.setItem(STORAGE_THEME_KEY, darkMode ? 'dark' : 'light');
     } catch {
       // ignore storage failure
     }
@@ -143,36 +136,36 @@ export default function App() {
       setActiveView(next.view);
       setSharedTrip(next.sharedTrip);
     };
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   const navigateTo = useCallback(
     (view: AppView) => {
       setActiveView(view);
       const targetPath =
-        view === "itinerary"
-          ? "/"
-          : view === "budget"
-            ? "/budget"
-            : view === "packing"
-              ? "/packing"
-              : "/share";
+        view === 'itinerary'
+          ? '/'
+          : view === 'budget'
+          ? '/budget'
+          : view === 'packing'
+          ? '/packing'
+          : '/share';
 
-      if (view === "share") {
+      if (view === 'share') {
         const encoded = encodeSharePayload(trip);
         const url = `${targetPath}?trip=${encoded}`;
         if (url.length < 16000) {
-          window.history.pushState({}, "", url);
+          window.history.pushState({}, '', url);
         } else {
-          window.history.pushState({}, "", targetPath);
+          window.history.pushState({}, '', targetPath);
         }
         setSharedTrip(null);
       } else {
-        window.history.pushState({}, "", targetPath);
+        window.history.pushState({}, '', targetPath);
       }
     },
-    [trip],
+    [trip]
   );
 
   const handleCopyShareLink = useCallback(async () => {
@@ -180,10 +173,10 @@ export default function App() {
     const shareUrl = `${window.location.origin}/share?trip=${encoded}`;
     try {
       await navigator.clipboard.writeText(shareUrl);
-      showToast("Shareable read-only link copied to clipboard.");
+      showToast('Shareable read-only link copied to clipboard.');
     } catch {
-      navigateTo("share");
-      showToast("Opened read-only share route (/share).");
+      navigateTo('share');
+      showToast('Opened read-only share route (/share).');
     }
   }, [trip, showToast, navigateTo]);
 
@@ -192,13 +185,13 @@ export default function App() {
     setTrip((prev) => ({
       ...prev,
       places: prev.places.map((p) =>
-        p.id === placeId ? { ...p, saved: !p.saved } : p,
+        p.id === placeId ? { ...p, saved: !p.saved } : p
       ),
     }));
   }, []);
 
   const handleAddCustomPlace = useCallback(
-    (placeInput: Omit<Place, "id">) => {
+    (placeInput: Omit<Place, 'id'>) => {
       const newPlace: Place = {
         ...placeInput,
         id: `place-custom-${Date.now()}`,
@@ -210,7 +203,7 @@ export default function App() {
       setSelectedPlaceId(newPlace.id);
       showToast(`Added "${newPlace.name}" to saved places.`);
     },
-    [showToast],
+    [showToast]
   );
 
   const handleAddPlaceToDay = useCallback(
@@ -223,20 +216,20 @@ export default function App() {
           id: `stop-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
           placeId: place.id,
           durationMinutes: place.durationMinutes,
-          travelModeToNext: "walk" as TravelMode,
-          note: "",
+          travelModeToNext: 'walk' as TravelMode,
+          note: '',
         };
 
         return {
           ...prev,
           places: prev.places.map((p) =>
-            p.id === placeId ? { ...p, saved: true } : p,
+            p.id === placeId ? { ...p, saved: true } : p
           ),
           days: prev.days.map((d) => {
             if (d.id !== dayId) return d;
             const nextStops = [...d.stops];
             const idx =
-              typeof insertIndex === "number"
+              typeof insertIndex === 'number'
                 ? Math.max(0, Math.min(insertIndex, nextStops.length))
                 : nextStops.length;
             nextStops.splice(idx, 0, newStop);
@@ -246,7 +239,7 @@ export default function App() {
       });
       setSelectedDayId(dayId);
     },
-    [],
+    []
   );
 
   const handleMoveStop = useCallback(
@@ -258,9 +251,7 @@ export default function App() {
         if (!movingStop) return prev;
 
         if (fromDayId === toDayId) {
-          const currentIndex = sourceDay.stops.findIndex(
-            (s) => s.id === stopId,
-          );
+          const currentIndex = sourceDay.stops.findIndex((s) => s.id === stopId);
           if (currentIndex === -1 || currentIndex === toIndex) return prev;
           const updated = [...sourceDay.stops];
           updated.splice(currentIndex, 1);
@@ -269,7 +260,7 @@ export default function App() {
           return {
             ...prev,
             days: prev.days.map((d) =>
-              d.id === fromDayId ? { ...d, stops: updated } : d,
+              d.id === fromDayId ? { ...d, stops: updated } : d
             ),
           };
         }
@@ -282,10 +273,7 @@ export default function App() {
             }
             if (d.id === toDayId) {
               const nextStops = [...d.stops];
-              const boundedIndex = Math.max(
-                0,
-                Math.min(toIndex, nextStops.length),
-              );
+              const boundedIndex = Math.max(0, Math.min(toIndex, nextStops.length));
               nextStops.splice(boundedIndex, 0, movingStop);
               return { ...d, stops: nextStops };
             }
@@ -295,18 +283,14 @@ export default function App() {
       });
       setSelectedDayId(toDayId);
     },
-    [],
+    []
   );
 
   const handleUpdateStop = useCallback(
     (
       dayId: string,
       stopId: string,
-      patch: Partial<{
-        durationMinutes: number;
-        travelModeToNext: TravelMode;
-        note: string;
-      }>,
+      patch: Partial<{ durationMinutes: number; travelModeToNext: TravelMode; note: string }>
     ) => {
       setTrip((prev) => ({
         ...prev,
@@ -315,14 +299,14 @@ export default function App() {
             ? {
                 ...d,
                 stops: d.stops.map((s) =>
-                  s.id === stopId ? { ...s, ...patch } : s,
+                  s.id === stopId ? { ...s, ...patch } : s
                 ),
               }
-            : d,
+            : d
         ),
       }));
     },
-    [],
+    []
   );
 
   const handleRemoveStop = useCallback((dayId: string, stopId: string) => {
@@ -331,7 +315,7 @@ export default function App() {
       days: prev.days.map((d) =>
         d.id === dayId
           ? { ...d, stops: d.stops.filter((s) => s.id !== stopId) }
-          : d,
+          : d
       ),
     }));
   }, []);
@@ -344,7 +328,7 @@ export default function App() {
         id: `day-${Date.now()}`,
         title: `Explore Day ${nextNum}`,
         date: nextDate,
-        startTime: "09:00",
+        startTime: '09:00',
         stops: [],
       };
       setSelectedDayId(newDay.id);
@@ -363,14 +347,14 @@ export default function App() {
   const handleUpdateDay = useCallback(
     (
       dayId: string,
-      patch: Partial<Pick<ItineraryDay, "title" | "date" | "startTime">>,
+      patch: Partial<Pick<ItineraryDay, 'title' | 'date' | 'startTime'>>
     ) => {
       setTrip((prev) => ({
         ...prev,
         days: prev.days.map((d) => (d.id === dayId ? { ...d, ...patch } : d)),
       }));
     },
-    [],
+    []
   );
 
   // Budget mutations
@@ -383,17 +367,20 @@ export default function App() {
       setTrip((prev) => ({
         ...prev,
         categoryBudgets: prev.categoryBudgets.map((cb) =>
-          cb.category === category ? { ...cb, limitUsd } : cb,
+          cb.category === category ? { ...cb, limitUsd } : cb
         ),
       }));
     },
-    [],
+    []
   );
 
-  const handleAddExpense = useCallback((expense: Omit<ExpenseItem, "id">) => {
+  const handleAddExpense = useCallback((expense: Omit<ExpenseItem, 'id'>) => {
     setTrip((prev) => ({
       ...prev,
-      expenses: [{ ...expense, id: `exp-${Date.now()}` }, ...prev.expenses],
+      expenses: [
+        { ...expense, id: `exp-${Date.now()}` },
+        ...prev.expenses,
+      ],
     }));
   }, []);
 
@@ -401,7 +388,7 @@ export default function App() {
     setTrip((prev) => ({
       ...prev,
       expenses: prev.expenses.map((e) =>
-        e.id === expenseId ? { ...e, paid: !e.paid } : e,
+        e.id === expenseId ? { ...e, paid: !e.paid } : e
       ),
     }));
   }, []);
@@ -414,12 +401,9 @@ export default function App() {
   }, []);
 
   // Packing mutations
-  const handleUpdatePackingGroups = useCallback(
-    (packingGroups: PackingGroup[]) => {
-      setTrip((prev) => ({ ...prev, packingGroups }));
-    },
-    [],
-  );
+  const handleUpdatePackingGroups = useCallback((packingGroups: PackingGroup[]) => {
+    setTrip((prev) => ({ ...prev, packingGroups }));
+  }, []);
 
   // Import / Export / Presets
   const handleImportJson = async (file: File) => {
@@ -432,8 +416,8 @@ export default function App() {
       showToast(`Imported trip "${parsed.title}" from JSON.`);
     } catch (err) {
       showToast(
-        err instanceof Error ? err.message : "Failed to import JSON file.",
-        true,
+        err instanceof Error ? err.message : 'Failed to import JSON file.',
+        true
       );
     }
   };
@@ -444,11 +428,13 @@ export default function App() {
       const updated = importIcsIntoTrip(text, trip);
       setTrip(updated);
       setSelectedDayId(updated.days[0]?.id || null);
-      showToast(`Imported ${updated.days.length} day(s) from calendar (.ics).`);
+      showToast(
+        `Imported ${updated.days.length} day(s) from calendar (.ics).`
+      );
     } catch (err) {
       showToast(
-        err instanceof Error ? err.message : "Failed to parse .ics file.",
-        true,
+        err instanceof Error ? err.message : 'Failed to parse .ics file.',
+        true
       );
     }
   };
@@ -457,7 +443,7 @@ export default function App() {
     setTrip(SAMPLE_TRIP);
     setSelectedDayId(SAMPLE_TRIP.days[0]?.id || null);
     setSelectedPlaceId(null);
-    showToast("Restored Kyoto Autumn Circuit sample trip.");
+    showToast('Restored Kyoto Autumn Circuit sample trip.');
   };
 
   const handleNewBlankTrip = () => {
@@ -465,7 +451,7 @@ export default function App() {
     setTrip(blank);
     setSelectedDayId(null);
     setSelectedPlaceId(null);
-    showToast("Created a new blank trip.");
+    showToast('Created a new blank trip.');
   };
 
   const activeShareTrip = sharedTrip || trip;
@@ -475,18 +461,18 @@ export default function App() {
       <TopBar
         activeView={activeView}
         onNavigate={navigateTo}
-        trip={activeView === "share" ? activeShareTrip : trip}
+        trip={activeView === 'share' ? activeShareTrip : trip}
         darkMode={darkMode}
         onToggleDarkMode={() => setDarkMode((d) => !d)}
         onPrint={() => window.print()}
         onOpenTripSettings={() => setTripSettingsOpen(true)}
         onExportJson={() => {
           exportTripToJson(trip);
-          showToast("Exported trip JSON backup.");
+          showToast('Exported trip JSON backup.');
         }}
         onExportIcs={() => {
           exportTripToIcs(trip);
-          showToast("Exported itinerary calendar (.ics).");
+          showToast('Exported itinerary calendar (.ics).');
         }}
         onImportJson={handleImportJson}
         onImportIcs={handleImportIcs}
@@ -498,15 +484,15 @@ export default function App() {
 
       {/* Main Screen Views (hidden during print) */}
       <main className="no-print">
-        {activeView === "itinerary" && (
+        {activeView === 'itinerary' && (
           <div className="mx-auto max-w-[1600px] px-3 sm:px-6 py-4">
             {/* Mobile / Tablet Pane Switcher */}
             <div className="mb-3 grid grid-cols-3 gap-1 rounded-lg border border-slate-200 bg-white p-1 lg:hidden dark:border-slate-800 dark:bg-slate-900">
               {(
                 [
-                  { id: "places", label: "Places" },
-                  { id: "schedule", label: "Schedule" },
-                  { id: "map", label: "Map" },
+                  { id: 'places', label: 'Places' },
+                  { id: 'schedule', label: 'Schedule' },
+                  { id: 'map', label: 'Map' },
                 ] as const
               ).map((tab) => (
                 <button
@@ -515,8 +501,8 @@ export default function App() {
                   onClick={() => setMobilePane(tab.id)}
                   className={`rounded-md py-1.5 text-xs font-medium transition-colors ${
                     mobilePane === tab.id
-                      ? "bg-teal-700 text-white dark:bg-teal-600"
-                      : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                      ? 'bg-teal-700 text-white dark:bg-teal-600'
+                      : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
                   }`}
                 >
                   {tab.label}
@@ -528,7 +514,7 @@ export default function App() {
             <div className="grid grid-cols-1 gap-4 lg:h-[calc(100vh-132px)] lg:grid-cols-12">
               <div
                 className={`lg:col-span-3 lg:block lg:h-full lg:min-h-0 ${
-                  mobilePane === "places" ? "block h-[72vh]" : "hidden"
+                  mobilePane === 'places' ? 'block h-[72vh]' : 'hidden'
                 }`}
               >
                 <SavedPlacesPanel
@@ -551,7 +537,7 @@ export default function App() {
 
               <div
                 className={`lg:col-span-4 lg:block lg:h-full lg:min-h-0 ${
-                  mobilePane === "schedule" ? "block h-[72vh]" : "hidden"
+                  mobilePane === 'schedule' ? 'block h-[72vh]' : 'hidden'
                 }`}
               >
                 <DayPlanner
@@ -575,7 +561,7 @@ export default function App() {
 
               <div
                 className={`lg:col-span-5 lg:block lg:h-full lg:min-h-0 ${
-                  mobilePane === "map" ? "block h-[72vh]" : "hidden"
+                  mobilePane === 'map' ? 'block h-[72vh]' : 'hidden'
                 }`}
               >
                 <MapCanvas
@@ -599,7 +585,7 @@ export default function App() {
           </div>
         )}
 
-        {activeView === "budget" && (
+        {activeView === 'budget' && (
           <BudgetTracker
             displayCurrency={trip.displayCurrency}
             categoryBudgets={trip.categoryBudgets}
@@ -614,28 +600,28 @@ export default function App() {
           />
         )}
 
-        {activeView === "packing" && (
+        {activeView === 'packing' && (
           <PackingManager
             groups={trip.packingGroups}
             onUpdateGroups={handleUpdatePackingGroups}
           />
         )}
 
-        {activeView === "share" && (
+        {activeView === 'share' && (
           <ShareView
             trip={activeShareTrip}
             isExternalSharedPayload={Boolean(sharedTrip)}
             darkMode={darkMode}
             onCopyShareLink={handleCopyShareLink}
             onPrint={() => window.print()}
-            onReturnToEditor={() => navigateTo("itinerary")}
+            onReturnToEditor={() => navigateTo('itinerary')}
             onForkSharedTrip={() => {
               if (sharedTrip) {
                 setTrip(sharedTrip);
                 setSharedTrip(null);
                 setSelectedDayId(sharedTrip.days[0]?.id || null);
-                navigateTo("itinerary");
-                showToast("Saved an editable copy of the shared trip.");
+                navigateTo('itinerary');
+                showToast('Saved an editable copy of the shared trip.');
               }
             }}
           />
@@ -643,7 +629,7 @@ export default function App() {
       </main>
 
       {/* Dedicated Print-Friendly Itinerary */}
-      <PrintItinerary trip={activeView === "share" ? activeShareTrip : trip} />
+      <PrintItinerary trip={activeView === 'share' ? activeShareTrip : trip} />
 
       {/* Modals */}
       {tripSettingsOpen && (
@@ -658,7 +644,7 @@ export default function App() {
                 date: addDaysToIsoDate(patch.startDate, idx),
               })),
             }));
-            showToast("Updated trip details.");
+            showToast('Updated trip details.');
           }}
           onClose={() => setTripSettingsOpen(false)}
         />
@@ -679,8 +665,8 @@ export default function App() {
           aria-live="polite"
           className={`no-print fixed bottom-5 right-5 z-[600] rounded-lg border px-4 py-2.5 text-xs font-medium shadow-lg ${
             toast.isError
-              ? "border-rose-300 bg-rose-50 text-rose-800 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200"
-              : "border-slate-200 bg-slate-900 text-white dark:border-slate-700 dark:bg-slate-800"
+              ? 'border-rose-300 bg-rose-50 text-rose-800 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-200'
+              : 'border-slate-200 bg-slate-900 text-white dark:border-slate-700 dark:bg-slate-800'
           }`}
         >
           {toast.message}

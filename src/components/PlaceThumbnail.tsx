@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { PlaceCategory } from "../types/trip";
-import { CATEGORY_META } from "../utils/travel";
+import { useState } from 'react';
+import { PlaceCategory } from '../types/trip';
+import { CATEGORY_META } from '../utils/travel';
 
 interface PlaceThumbnailProps {
   src?: string;
@@ -9,12 +9,7 @@ interface PlaceThumbnailProps {
   className?: string;
 }
 
-export function PlaceThumbnail({
-  src,
-  alt,
-  category,
-  className = "",
-}: PlaceThumbnailProps) {
+export function PlaceThumbnail({ src, alt, category, className = '' }: PlaceThumbnailProps) {
   const [failed, setFailed] = useState(false);
   const meta = CATEGORY_META[category];
 

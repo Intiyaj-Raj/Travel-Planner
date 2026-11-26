@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState } from 'react';
 import {
   ArrowDown,
   ArrowUp,
@@ -11,8 +11,13 @@ import {
   RotateCcw,
   Trash2,
   TrainFront,
-} from "lucide-react";
-import { CurrencyCode, ItineraryDay, Place, TravelMode } from "../types/trip";
+} from 'lucide-react';
+import {
+  CurrencyCode,
+  ItineraryDay,
+  Place,
+  TravelMode,
+} from '../types/trip';
 import {
   CATEGORY_META,
   convertCurrency,
@@ -23,7 +28,7 @@ import {
   formatShortDate,
   haversineKm,
   parseTimeToMinutes,
-} from "../utils/travel";
+} from '../utils/travel';
 
 interface DayPlannerProps {
   days: ItineraryDay[];
@@ -35,49 +40,29 @@ interface DayPlannerProps {
   onSelectPlace: (placeId: string) => void;
   onAddDay: () => void;
   onRemoveDay: (dayId: string) => void;
-  onUpdateDay: (
-    dayId: string,
-    patch: Partial<Pick<ItineraryDay, "title" | "date" | "startTime">>,
-  ) => void;
-  onAddPlaceToDay: (
-    placeId: string,
-    dayId: string,
-    insertIndex?: number,
-  ) => void;
-  onMoveStop: (
-    fromDayId: string,
-    stopId: string,
-    toDayId: string,
-    toIndex: number,
-  ) => void;
+  onUpdateDay: (dayId: string, patch: Partial<Pick<ItineraryDay, 'title' | 'date' | 'startTime'>>) => void;
+  onAddPlaceToDay: (placeId: string, dayId: string, insertIndex?: number) => void;
+  onMoveStop: (fromDayId: string, stopId: string, toDayId: string, toIndex: number) => void;
   onUpdateStop: (
     dayId: string,
     stopId: string,
-    patch: Partial<{
-      durationMinutes: number;
-      travelModeToNext: TravelMode;
-      note: string;
-    }>,
+    patch: Partial<{ durationMinutes: number; travelModeToNext: TravelMode; note: string }>
   ) => void;
   onRemoveStop: (dayId: string, stopId: string) => void;
   onLoadSampleTrip: () => void;
 }
 
 interface DragPayload {
-  type: "place" | "stop";
+  type: 'place' | 'stop';
   placeId?: string;
   fromDayId?: string;
   stopId?: string;
 }
 
-const TRAVEL_MODES: {
-  id: TravelMode;
-  label: string;
-  Icon: React.ComponentType<{ className?: string }>;
-}[] = [
-  { id: "walk", label: "Walk", Icon: Footprints },
-  { id: "transit", label: "Transit", Icon: TrainFront },
-  { id: "taxi", label: "Taxi", Icon: Car },
+const TRAVEL_MODES: { id: TravelMode; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: 'walk', label: 'Walk', Icon: Footprints },
+  { id: 'transit', label: 'Transit', Icon: TrainFront },
+  { id: 'taxi', label: 'Taxi', Icon: Car },
 ];
 
 export function DayPlanner({
@@ -98,13 +83,11 @@ export function DayPlanner({
   onLoadSampleTrip,
 }: DayPlannerProps) {
   const [dragOverTarget, setDragOverTarget] = useState<string | null>(null);
-  const [quickAddSelections, setQuickAddSelections] = useState<
-    Record<string, string>
-  >({});
+  const [quickAddSelections, setQuickAddSelections] = useState<Record<string, string>>({});
 
   const placeMap = useMemo(
     () => new Map(places.map((p) => [p.id, p])),
-    [places],
+    [places]
   );
 
   const savedOrAllPlaces = useMemo(() => {
@@ -114,7 +97,7 @@ export function DayPlanner({
 
   const parseDragPayload = (e: React.DragEvent): DragPayload | null => {
     try {
-      const raw = e.dataTransfer.getData("application/json");
+      const raw = e.dataTransfer.getData('application/json');
       if (!raw) return null;
       return JSON.parse(raw) as DragPayload;
     } catch {
@@ -125,18 +108,18 @@ export function DayPlanner({
   const handleStopDragStart = (
     e: React.DragEvent,
     fromDayId: string,
-    stopId: string,
+    stopId: string
   ) => {
     e.stopPropagation();
-    const payload: DragPayload = { type: "stop", fromDayId, stopId };
-    e.dataTransfer.setData("application/json", JSON.stringify(payload));
-    e.dataTransfer.effectAllowed = "move";
+    const payload: DragPayload = { type: 'stop', fromDayId, stopId };
+    e.dataTransfer.setData('application/json', JSON.stringify(payload));
+    e.dataTransfer.effectAllowed = 'move';
   };
 
   const handleDropOnDay = (
     e: React.DragEvent,
     toDayId: string,
-    toIndex: number,
+    toIndex: number
   ) => {
     e.preventDefault();
     e.stopPropagation();
@@ -145,9 +128,9 @@ export function DayPlanner({
     const payload = parseDragPayload(e);
     if (!payload) return;
 
-    if (payload.type === "place" && payload.placeId) {
+    if (payload.type === 'place' && payload.placeId) {
       onAddPlaceToDay(payload.placeId, toDayId, toIndex);
-    } else if (payload.type === "stop" && payload.fromDayId && payload.stopId) {
+    } else if (payload.type === 'stop' && payload.fromDayId && payload.stopId) {
       onMoveStop(payload.fromDayId, payload.stopId, toDayId, toIndex);
     }
   };
@@ -160,8 +143,7 @@ export function DayPlanner({
           Your itinerary has no days yet
         </h2>
         <p className="mt-1.5 max-w-sm text-sm text-slate-500 dark:text-slate-400">
-          Add Day 1 to start dragging places onto your schedule, or restore the
-          sample Kyoto trip.
+          Add Day 1 to start dragging places onto your schedule, or restore the sample Kyoto trip.
         </p>
         <div className="mt-5 flex flex-wrap items-center justify-center gap-2.5">
           <button
@@ -201,8 +183,8 @@ export function DayPlanner({
             onClick={() => onSelectDay(null)}
             className={`rounded-md px-2 py-1 text-[11px] font-medium transition-colors whitespace-nowrap ${
               selectedDayId === null
-                ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
-                : "text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900'
+                : 'text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800'
             }`}
           >
             Show All Routes
@@ -238,24 +220,15 @@ export function DayPlanner({
             if (nextStop) {
               const nextPlace = placeMap.get(nextStop.placeId);
               if (nextPlace) {
-                const km = haversineKm(
-                  p.lat,
-                  p.lng,
-                  nextPlace.lat,
-                  nextPlace.lng,
-                );
+                const km = haversineKm(p.lat, p.lng, nextPlace.lat, nextPlace.lng);
                 totalDistanceKm += km;
-                totalTransitMinutes += estimateTravelMinutes(
-                  km,
-                  s.travelModeToNext,
-                );
+                totalTransitMinutes += estimateTravelMinutes(km, s.travelModeToNext);
               }
             }
           });
 
           const isDayDropActive = dragOverTarget === `day-${day.id}`;
-          const quickChoice =
-            quickAddSelections[day.id] || savedOrAllPlaces[0]?.id || "";
+          const quickChoice = quickAddSelections[day.id] || savedOrAllPlaces[0]?.id || '';
 
           return (
             <div
@@ -272,10 +245,10 @@ export function DayPlanner({
               onDrop={(e) => handleDropOnDay(e, day.id, day.stops.length)}
               className={`rounded-xl border transition-colors ${
                 isDayDropActive
-                  ? "border-teal-600 ring-2 ring-teal-500/20 bg-teal-50/30 dark:bg-teal-950/20"
+                  ? 'border-teal-600 ring-2 ring-teal-500/20 bg-teal-50/30 dark:bg-teal-950/20'
                   : isDaySelected
-                    ? "border-teal-600/60 bg-white dark:border-teal-500/50 dark:bg-slate-800/30"
-                    : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950/40"
+                  ? 'border-teal-600/60 bg-white dark:border-teal-500/50 dark:bg-slate-800/30'
+                  : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950/40'
               }`}
             >
               {/* Day Header */}
@@ -291,27 +264,20 @@ export function DayPlanner({
                     type="text"
                     value={day.title}
                     onClick={(e) => e.stopPropagation()}
-                    onChange={(e) =>
-                      onUpdateDay(day.id, { title: e.target.value })
-                    }
+                    onChange={(e) => onUpdateDay(day.id, { title: e.target.value })}
                     aria-label={`Day ${dayIdx + 1} title`}
                     className="min-w-0 flex-1 rounded bg-transparent px-1 py-0.5 font-display text-sm font-semibold text-slate-900 hover:bg-white/80 focus:bg-white focus:outline-none focus:ring-1 focus:ring-teal-600 dark:text-slate-100 dark:hover:bg-slate-800 dark:focus:bg-slate-900"
                   />
                 </div>
 
-                <div
-                  className="flex items-center gap-2 shrink-0"
-                  onClick={(e) => e.stopPropagation()}
-                >
+                <div className="flex items-center gap-2 shrink-0" onClick={(e) => e.stopPropagation()}>
                   <span className="text-[11px] text-slate-500 dark:text-slate-400 whitespace-nowrap">
                     {formatShortDate(day.date)}
                   </span>
                   <input
                     type="time"
                     value={day.startTime}
-                    onChange={(e) =>
-                      onUpdateDay(day.id, { startTime: e.target.value })
-                    }
+                    onChange={(e) => onUpdateDay(day.id, { startTime: e.target.value })}
                     aria-label={`Day ${dayIdx + 1} start time`}
                     className="rounded border border-slate-200 bg-white px-1.5 py-0.5 font-mono text-[11px] text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
                   />
@@ -329,20 +295,15 @@ export function DayPlanner({
               {/* Day Metrics Strip */}
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-slate-200/60 px-3.5 py-1.5 text-[11px] text-slate-500 dark:border-slate-800/70 dark:text-slate-400">
                 <span className="tabular-nums">
-                  {day.stops.length} {day.stops.length === 1 ? "stop" : "stops"}
+                  {day.stops.length} {day.stops.length === 1 ? 'stop' : 'stops'}
                 </span>
                 <span aria-hidden="true">·</span>
                 <span className="font-mono tabular-nums">
-                  {totalTransitMinutes}m transit (
-                  {formatDistance(totalDistanceKm)})
+                  {totalTransitMinutes}m transit ({formatDistance(totalDistanceKm)})
                 </span>
                 <span aria-hidden="true">·</span>
                 <span className="font-mono tabular-nums">
-                  Est.{" "}
-                  {formatMoney(
-                    convertCurrency(totalStopCostUsd, "USD", displayCurrency),
-                    displayCurrency,
-                  )}
+                  Est. {formatMoney(convertCurrency(totalStopCostUsd, 'USD', displayCurrency), displayCurrency)}
                 </span>
                 {isDaySelected && (
                   <>
@@ -383,8 +344,7 @@ export function DayPlanner({
                         <button
                           type="button"
                           onClick={() => {
-                            if (quickChoice)
-                              onAddPlaceToDay(quickChoice, day.id, 0);
+                            if (quickChoice) onAddPlaceToDay(quickChoice, day.id, 0);
                           }}
                           className="inline-flex h-8 items-center gap-1 rounded-lg bg-teal-700 px-3 text-xs font-medium text-white hover:bg-teal-800 dark:bg-teal-600"
                         >
@@ -400,14 +360,11 @@ export function DayPlanner({
                     if (!place) return null;
 
                     const arrivalTime = formatMinutesToTime(cursorMinutes);
-                    const departureMinutes =
-                      cursorMinutes + stop.durationMinutes;
+                    const departureMinutes = cursorMinutes + stop.durationMinutes;
                     const departureTime = formatMinutesToTime(departureMinutes);
 
                     const nextStop = day.stops[stopIdx + 1];
-                    const nextPlace = nextStop
-                      ? placeMap.get(nextStop.placeId)
-                      : undefined;
+                    const nextPlace = nextStop ? placeMap.get(nextStop.placeId) : undefined;
                     let legDistanceKm = 0;
                     let legMinutes = 0;
                     if (nextPlace) {
@@ -415,27 +372,24 @@ export function DayPlanner({
                         place.lat,
                         place.lng,
                         nextPlace.lat,
-                        nextPlace.lng,
+                        nextPlace.lng
                       );
                       legMinutes = estimateTravelMinutes(
                         legDistanceKm,
-                        stop.travelModeToNext,
+                        stop.travelModeToNext
                       );
                     }
                     cursorMinutes = departureMinutes + legMinutes;
 
                     const catMeta = CATEGORY_META[place.category];
-                    const isStopDropActive =
-                      dragOverTarget === `stop-${stop.id}`;
+                    const isStopDropActive = dragOverTarget === `stop-${stop.id}`;
                     const isPlaceSelected = selectedPlaceId === place.id;
 
                     return (
                       <React.Fragment key={stop.id}>
                         <div
                           draggable
-                          onDragStart={(e) =>
-                            handleStopDragStart(e, day.id, stop.id)
-                          }
+                          onDragStart={(e) => handleStopDragStart(e, day.id, stop.id)}
                           onDragOver={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -448,10 +402,10 @@ export function DayPlanner({
                           }}
                           className={`group rounded-lg border p-2.5 cursor-grab active:cursor-grabbing transition-colors ${
                             isStopDropActive
-                              ? "border-teal-600 ring-2 ring-teal-500/20 bg-teal-50/40 dark:bg-teal-950/30"
+                              ? 'border-teal-600 ring-2 ring-teal-500/20 bg-teal-50/40 dark:bg-teal-950/30'
                               : isPlaceSelected
-                                ? "border-teal-600/70 bg-white dark:border-teal-500/60 dark:bg-slate-900"
-                                : "border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700"
+                              ? 'border-teal-600/70 bg-white dark:border-teal-500/60 dark:bg-slate-900'
+                              : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-slate-700'
                           }`}
                         >
                           <div className="flex items-start gap-2">
@@ -476,9 +430,7 @@ export function DayPlanner({
                                       {arrivalTime}–{departureTime}
                                     </span>
                                     <span aria-hidden="true">·</span>
-                                    <span className={catMeta.textClass}>
-                                      {catMeta.label}
-                                    </span>
+                                    <span className={catMeta.textClass}>{catMeta.label}</span>
                                     <span aria-hidden="true">·</span>
                                     <span className="inline-flex items-center gap-1">
                                       <Clock className="h-3 w-3 text-slate-400" />
@@ -490,10 +442,7 @@ export function DayPlanner({
                                         value={stop.durationMinutes}
                                         onClick={(e) => e.stopPropagation()}
                                         onChange={(e) => {
-                                          const val = Math.max(
-                                            10,
-                                            Number(e.target.value) || 30,
-                                          );
+                                          const val = Math.max(10, Number(e.target.value) || 30);
                                           onUpdateStop(day.id, stop.id, {
                                             durationMinutes: val,
                                           });
@@ -515,12 +464,7 @@ export function DayPlanner({
                                     type="button"
                                     disabled={stopIdx === 0}
                                     onClick={() =>
-                                      onMoveStop(
-                                        day.id,
-                                        stop.id,
-                                        day.id,
-                                        stopIdx - 1,
-                                      )
+                                      onMoveStop(day.id, stop.id, day.id, stopIdx - 1)
                                     }
                                     aria-label="Move stop up"
                                     className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30 dark:hover:bg-slate-800 dark:hover:text-slate-200"
@@ -531,12 +475,7 @@ export function DayPlanner({
                                     type="button"
                                     disabled={stopIdx === day.stops.length - 1}
                                     onClick={() =>
-                                      onMoveStop(
-                                        day.id,
-                                        stop.id,
-                                        day.id,
-                                        stopIdx + 1,
-                                      )
+                                      onMoveStop(day.id, stop.id, day.id, stopIdx + 1)
                                     }
                                     aria-label="Move stop down"
                                     className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30 dark:hover:bg-slate-800 dark:hover:text-slate-200"
@@ -545,9 +484,7 @@ export function DayPlanner({
                                   </button>
                                   <button
                                     type="button"
-                                    onClick={() =>
-                                      onRemoveStop(day.id, stop.id)
-                                    }
+                                    onClick={() => onRemoveStop(day.id, stop.id)}
                                     aria-label={`Remove ${place.name} from day`}
                                     className="rounded p-1 text-slate-400 hover:bg-rose-50 hover:text-rose-600 dark:hover:bg-rose-950/50 dark:hover:text-rose-400"
                                   >
@@ -563,9 +500,7 @@ export function DayPlanner({
                                 placeholder="Add timing or booking note..."
                                 onClick={(e) => e.stopPropagation()}
                                 onChange={(e) =>
-                                  onUpdateStop(day.id, stop.id, {
-                                    note: e.target.value,
-                                  })
+                                  onUpdateStop(day.id, stop.id, { note: e.target.value })
                                 }
                                 className="mt-1.5 w-full rounded border border-transparent bg-slate-50/70 px-2 py-1 text-[11px] text-slate-600 placeholder:text-slate-400 hover:border-slate-200 focus:border-teal-600 focus:bg-white focus:outline-none dark:bg-slate-800/50 dark:text-slate-300 dark:hover:border-slate-700 dark:focus:bg-slate-800"
                               />
@@ -604,8 +539,8 @@ export function DayPlanner({
                                     }
                                     className={`inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
                                       active
-                                        ? "bg-white text-teal-700 shadow-sm dark:bg-slate-900 dark:text-teal-400"
-                                        : "text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                                        ? 'bg-white text-teal-700 shadow-sm dark:bg-slate-900 dark:text-teal-400'
+                                        : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'
                                     }`}
                                   >
                                     <Icon className="h-3 w-3" />

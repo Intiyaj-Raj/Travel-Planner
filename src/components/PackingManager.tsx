@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState } from 'react';
 import {
   CheckSquare,
   ChevronDown,
@@ -8,30 +8,21 @@ import {
   Search,
   Square,
   Trash2,
-} from "lucide-react";
-import { PackingGroup, PackingTemplate } from "../types/trip";
-import { PACKING_TEMPLATES } from "../data/mockTrip";
+} from 'lucide-react';
+import { PackingGroup, PackingTemplate } from '../types/trip';
+import { PACKING_TEMPLATES } from '../data/mockTrip';
 
 interface PackingManagerProps {
   groups: PackingGroup[];
   onUpdateGroups: (groups: PackingGroup[]) => void;
 }
 
-export function PackingManager({
-  groups,
-  onUpdateGroups,
-}: PackingManagerProps) {
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState<
-    "all" | "remaining" | "packed"
-  >("all");
-  const [collapsedGroups, setCollapsedGroups] = useState<
-    Record<string, boolean>
-  >({});
-  const [newGroupTitle, setNewGroupTitle] = useState("");
-  const [newItemInputs, setNewItemInputs] = useState<Record<string, string>>(
-    {},
-  );
+export function PackingManager({ groups, onUpdateGroups }: PackingManagerProps) {
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'remaining' | 'packed'>('all');
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+  const [newGroupTitle, setNewGroupTitle] = useState('');
+  const [newItemInputs, setNewItemInputs] = useState<Record<string, string>>({});
   const [newSubInputs, setNewSubInputs] = useState<Record<string, string>>({});
   const [openSubForm, setOpenSubForm] = useState<Record<string, boolean>>({});
 
@@ -52,15 +43,11 @@ export function PackingManager({
         }
       });
     });
-    const pct =
-      totalChecks > 0 ? Math.round((doneChecks / totalChecks) * 100) : 0;
+    const pct = totalChecks > 0 ? Math.round((doneChecks / totalChecks) * 100) : 0;
     return { totalChecks, doneChecks, pct };
   }, [groups]);
 
-  const applyTemplate = (
-    template: PackingTemplate,
-    mode: "merge" | "replace",
-  ) => {
+  const applyTemplate = (template: PackingTemplate, mode: 'merge' | 'replace') => {
     const clonedGroups: PackingGroup[] = template.groups.map((g, gi) => ({
       id: `pg-${Date.now()}-${gi}`,
       title: g.title,
@@ -74,7 +61,7 @@ export function PackingManager({
       })),
     }));
 
-    if (mode === "replace") {
+    if (mode === 'replace') {
       onUpdateGroups(clonedGroups);
       return;
     }
@@ -83,14 +70,14 @@ export function PackingManager({
     const next = [...groups];
     clonedGroups.forEach((incoming) => {
       const existingIdx = next.findIndex(
-        (g) => g.title.toLowerCase() === incoming.title.toLowerCase(),
+        (g) => g.title.toLowerCase() === incoming.title.toLowerCase()
       );
       if (existingIdx >= 0) {
         const existingLabels = new Set(
-          next[existingIdx].items.map((i) => i.label.toLowerCase()),
+          next[existingIdx].items.map((i) => i.label.toLowerCase())
         );
         const uniqueItems = incoming.items.filter(
-          (i) => !existingLabels.has(i.label.toLowerCase()),
+          (i) => !existingLabels.has(i.label.toLowerCase())
         );
         next[existingIdx] = {
           ...next[existingIdx],
@@ -110,7 +97,7 @@ export function PackingManager({
       ...groups,
       { id: `pg-${Date.now()}`, title: newGroupTitle.trim(), items: [] },
     ]);
-    setNewGroupTitle("");
+    setNewGroupTitle('');
   };
 
   const handleDeleteGroup = (groupId: string) => {
@@ -118,7 +105,7 @@ export function PackingManager({
   };
 
   const handleAddItem = (groupId: string) => {
-    const label = (newItemInputs[groupId] || "").trim();
+    const label = (newItemInputs[groupId] || '').trim();
     if (!label) return;
     onUpdateGroups(
       groups.map((g) =>
@@ -136,10 +123,10 @@ export function PackingManager({
                 },
               ],
             }
-          : g,
-      ),
+          : g
+      )
     );
-    setNewItemInputs((prev) => ({ ...prev, [groupId]: "" }));
+    setNewItemInputs((prev) => ({ ...prev, [groupId]: '' }));
   };
 
   const handleToggleItem = (groupId: string, itemId: string) => {
@@ -154,14 +141,11 @@ export function PackingManager({
             return {
               ...item,
               checked: nextChecked,
-              subItems: item.subItems.map((s) => ({
-                ...s,
-                checked: nextChecked,
-              })),
+              subItems: item.subItems.map((s) => ({ ...s, checked: nextChecked })),
             };
           }),
         };
-      }),
+      })
     );
   };
 
@@ -174,11 +158,11 @@ export function PackingManager({
               items: g.items.map((item) =>
                 item.id === itemId
                   ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-                  : item,
+                  : item
               ),
             }
-          : g,
-      ),
+          : g
+      )
     );
   };
 
@@ -187,13 +171,13 @@ export function PackingManager({
       groups.map((g) =>
         g.id === groupId
           ? { ...g, items: g.items.filter((i) => i.id !== itemId) }
-          : g,
-      ),
+          : g
+      )
     );
   };
 
   const handleAddSubItem = (groupId: string, itemId: string) => {
-    const label = (newSubInputs[itemId] || "").trim();
+    const label = (newSubInputs[itemId] || '').trim();
     if (!label) return;
     onUpdateGroups(
       groups.map((g) =>
@@ -210,20 +194,16 @@ export function PackingManager({
                         { id: `ps-${Date.now()}`, label, checked: false },
                       ],
                     }
-                  : item,
+                  : item
               ),
             }
-          : g,
-      ),
+          : g
+      )
     );
-    setNewSubInputs((prev) => ({ ...prev, [itemId]: "" }));
+    setNewSubInputs((prev) => ({ ...prev, [itemId]: '' }));
   };
 
-  const handleToggleSubItem = (
-    groupId: string,
-    itemId: string,
-    subId: string,
-  ) => {
+  const handleToggleSubItem = (groupId: string, itemId: string, subId: string) => {
     onUpdateGroups(
       groups.map((g) => {
         if (g.id !== groupId) return g;
@@ -232,22 +212,17 @@ export function PackingManager({
           items: g.items.map((item) => {
             if (item.id !== itemId) return item;
             const nextSubs = item.subItems.map((s) =>
-              s.id === subId ? { ...s, checked: !s.checked } : s,
+              s.id === subId ? { ...s, checked: !s.checked } : s
             );
-            const allChecked =
-              nextSubs.length > 0 && nextSubs.every((s) => s.checked);
+            const allChecked = nextSubs.length > 0 && nextSubs.every((s) => s.checked);
             return { ...item, checked: allChecked, subItems: nextSubs };
           }),
         };
-      }),
+      })
     );
   };
 
-  const handleDeleteSubItem = (
-    groupId: string,
-    itemId: string,
-    subId: string,
-  ) => {
+  const handleDeleteSubItem = (groupId: string, itemId: string, subId: string) => {
     onUpdateGroups(
       groups.map((g) =>
         g.id === groupId
@@ -257,14 +232,12 @@ export function PackingManager({
                 if (item.id !== itemId) return item;
                 const nextSubs = item.subItems.filter((s) => s.id !== subId);
                 const allChecked =
-                  nextSubs.length > 0
-                    ? nextSubs.every((s) => s.checked)
-                    : item.checked;
+                  nextSubs.length > 0 ? nextSubs.every((s) => s.checked) : item.checked;
                 return { ...item, checked: allChecked, subItems: nextSubs };
               }),
             }
-          : g,
-      ),
+          : g
+      )
     );
   };
 
@@ -280,8 +253,7 @@ export function PackingManager({
               Packing & Checklist Manager
             </h1>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-              Organize gear into nested lists, apply trip templates, and track
-              packing completion.
+              Organize gear into nested lists, apply trip templates, and track packing completion.
             </p>
           </div>
           <div className="text-right">
@@ -336,14 +308,14 @@ export function PackingManager({
               <div className="mt-3 flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => applyTemplate(tpl, "merge")}
+                  onClick={() => applyTemplate(tpl, 'merge')}
                   className="flex-1 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-medium text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
                 >
                   Merge
                 </button>
                 <button
                   type="button"
-                  onClick={() => applyTemplate(tpl, "replace")}
+                  onClick={() => applyTemplate(tpl, 'replace')}
                   className="flex-1 rounded-md bg-teal-700 px-2.5 py-1.5 text-[11px] font-medium text-white hover:bg-teal-800 dark:bg-teal-600 dark:hover:bg-teal-500"
                 >
                   Use Template
@@ -370,15 +342,15 @@ export function PackingManager({
           </div>
 
           <div className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white p-1 dark:border-slate-800 dark:bg-slate-900">
-            {(["all", "remaining", "packed"] as const).map((status) => (
+            {(['all', 'remaining', 'packed'] as const).map((status) => (
               <button
                 key={status}
                 type="button"
                 onClick={() => setStatusFilter(status)}
                 className={`rounded-md px-3 py-1 text-xs font-medium capitalize transition-colors ${
                   statusFilter === status
-                    ? "bg-teal-700 text-white dark:bg-teal-600"
-                    : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                    ? 'bg-teal-700 text-white dark:bg-teal-600'
+                    : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
                 }`}
               >
                 {status}
@@ -414,12 +386,11 @@ export function PackingManager({
             Your packing list is empty
           </h2>
           <p className="mt-1 max-w-sm text-xs text-slate-500 dark:text-slate-400">
-            Apply one of the quick templates above or create your first packing
-            category to get started.
+            Apply one of the quick templates above or create your first packing category to get started.
           </p>
           <button
             type="button"
-            onClick={() => applyTemplate(PACKING_TEMPLATES[0], "replace")}
+            onClick={() => applyTemplate(PACKING_TEMPLATES[0], 'replace')}
             className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-teal-700 px-4 py-2 text-xs font-semibold text-white hover:bg-teal-800 dark:bg-teal-600"
           >
             Load Autumn City Break Template
@@ -450,12 +421,12 @@ export function PackingManager({
                 item.subItems.length > 0
                   ? item.subItems.every((s) => s.checked)
                   : item.checked;
-              if (statusFilter === "packed" && !isItemPacked) return false;
-              if (statusFilter === "remaining" && isItemPacked) return false;
+              if (statusFilter === 'packed' && !isItemPacked) return false;
+              if (statusFilter === 'remaining' && isItemPacked) return false;
               if (q) {
                 const matchMain = item.label.toLowerCase().includes(q);
                 const matchSub = item.subItems.some((s) =>
-                  s.label.toLowerCase().includes(q),
+                  s.label.toLowerCase().includes(q)
                 );
                 if (!matchMain && !matchSub) return false;
               }
@@ -520,15 +491,13 @@ export function PackingManager({
                       {filteredItems.length === 0 ? (
                         <p className="py-4 text-center text-xs text-slate-400 dark:text-slate-500">
                           {group.items.length === 0
-                            ? "No items in this category yet."
-                            : "No items match the current filter."}
+                            ? 'No items in this category yet.'
+                            : 'No items match the current filter.'}
                         </p>
                       ) : (
                         filteredItems.map((item) => {
                           const hasSubs = item.subItems.length > 0;
-                          const subsDone = item.subItems.filter(
-                            (s) => s.checked,
-                          ).length;
+                          const subsDone = item.subItems.filter((s) => s.checked).length;
                           const isDone = hasSubs
                             ? subsDone === item.subItems.length
                             : item.checked;
@@ -541,9 +510,7 @@ export function PackingManager({
                               <div className="flex items-center justify-between gap-2">
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    handleToggleItem(group.id, item.id)
-                                  }
+                                  onClick={() => handleToggleItem(group.id, item.id)}
                                   className="flex flex-1 items-center gap-2 text-left min-w-0"
                                 >
                                   {isDone ? (
@@ -554,8 +521,8 @@ export function PackingManager({
                                   <span
                                     className={`text-xs font-medium truncate ${
                                       isDone
-                                        ? "line-through text-slate-400 dark:text-slate-500"
-                                        : "text-slate-800 dark:text-slate-100"
+                                        ? 'line-through text-slate-400 dark:text-slate-500'
+                                        : 'text-slate-800 dark:text-slate-100'
                                     }`}
                                   >
                                     {item.label}
@@ -571,9 +538,7 @@ export function PackingManager({
                                   <div className="flex items-center rounded border border-slate-200 bg-white text-[11px] dark:border-slate-700 dark:bg-slate-900">
                                     <button
                                       type="button"
-                                      onClick={() =>
-                                        handleUpdateQty(group.id, item.id, -1)
-                                      }
+                                      onClick={() => handleUpdateQty(group.id, item.id, -1)}
                                       aria-label="Decrease quantity"
                                       className="px-1.5 py-0.5 text-slate-500 hover:text-slate-900 dark:hover:text-slate-100"
                                     >
@@ -584,9 +549,7 @@ export function PackingManager({
                                     </span>
                                     <button
                                       type="button"
-                                      onClick={() =>
-                                        handleUpdateQty(group.id, item.id, 1)
-                                      }
+                                      onClick={() => handleUpdateQty(group.id, item.id, 1)}
                                       aria-label="Increase quantity"
                                       className="px-1.5 py-0.5 text-slate-500 hover:text-slate-900 dark:hover:text-slate-100"
                                     >
@@ -610,9 +573,7 @@ export function PackingManager({
 
                                   <button
                                     type="button"
-                                    onClick={() =>
-                                      handleDeleteItem(group.id, item.id)
-                                    }
+                                    onClick={() => handleDeleteItem(group.id, item.id)}
                                     aria-label={`Delete ${item.label}`}
                                     className="rounded p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
                                   >
@@ -622,8 +583,7 @@ export function PackingManager({
                               </div>
 
                               {/* Nested Sub-items */}
-                              {(item.subItems.length > 0 ||
-                                openSubForm[item.id]) && (
+                              {(item.subItems.length > 0 || openSubForm[item.id]) && (
                                 <div className="mt-2 ml-6 space-y-1.5 border-l border-slate-200 pl-3 dark:border-slate-700">
                                   {item.subItems.map((sub) => (
                                     <div
@@ -633,11 +593,7 @@ export function PackingManager({
                                       <button
                                         type="button"
                                         onClick={() =>
-                                          handleToggleSubItem(
-                                            group.id,
-                                            item.id,
-                                            sub.id,
-                                          )
+                                          handleToggleSubItem(group.id, item.id, sub.id)
                                         }
                                         className="flex flex-1 items-center gap-2 text-left min-w-0"
                                       >
@@ -649,8 +605,8 @@ export function PackingManager({
                                         <span
                                           className={`text-[11px] truncate ${
                                             sub.checked
-                                              ? "line-through text-slate-400 dark:text-slate-500"
-                                              : "text-slate-600 dark:text-slate-300"
+                                              ? 'line-through text-slate-400 dark:text-slate-500'
+                                              : 'text-slate-600 dark:text-slate-300'
                                           }`}
                                         >
                                           {sub.label}
@@ -659,11 +615,7 @@ export function PackingManager({
                                       <button
                                         type="button"
                                         onClick={() =>
-                                          handleDeleteSubItem(
-                                            group.id,
-                                            item.id,
-                                            sub.id,
-                                          )
+                                          handleDeleteSubItem(group.id, item.id, sub.id)
                                         }
                                         aria-label={`Remove ${sub.label}`}
                                         className="rounded p-0.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
@@ -677,7 +629,7 @@ export function PackingManager({
                                     <div className="flex items-center gap-1.5 pt-1">
                                       <input
                                         type="text"
-                                        value={newSubInputs[item.id] || ""}
+                                        value={newSubInputs[item.id] || ''}
                                         onChange={(e) =>
                                           setNewSubInputs((prev) => ({
                                             ...prev,
@@ -685,7 +637,7 @@ export function PackingManager({
                                           }))
                                         }
                                         onKeyDown={(e) => {
-                                          if (e.key === "Enter") {
+                                          if (e.key === 'Enter') {
                                             e.preventDefault();
                                             handleAddSubItem(group.id, item.id);
                                           }
@@ -695,9 +647,7 @@ export function PackingManager({
                                       />
                                       <button
                                         type="button"
-                                        onClick={() =>
-                                          handleAddSubItem(group.id, item.id)
-                                        }
+                                        onClick={() => handleAddSubItem(group.id, item.id)}
                                         className="h-7 rounded bg-slate-800 px-2.5 text-[11px] font-medium text-white hover:bg-slate-700 dark:bg-teal-600"
                                       >
                                         Add
@@ -716,7 +666,7 @@ export function PackingManager({
                     <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
                       <input
                         type="text"
-                        value={newItemInputs[group.id] || ""}
+                        value={newItemInputs[group.id] || ''}
                         onChange={(e) =>
                           setNewItemInputs((prev) => ({
                             ...prev,
@@ -724,7 +674,7 @@ export function PackingManager({
                           }))
                         }
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") {
+                          if (e.key === 'Enter') {
                             e.preventDefault();
                             handleAddItem(group.id);
                           }
