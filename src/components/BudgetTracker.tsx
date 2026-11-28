@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
   Plus,
   Receipt,
   Trash2,
-} from 'lucide-react';
+} from "lucide-react";
 import {
   BudgetCategoryId,
   CategoryBudget,
@@ -13,12 +13,8 @@ import {
   ExpenseItem,
   ItineraryDay,
   Place,
-} from '../types/trip';
-import {
-  CURRENCY_META,
-  convertCurrency,
-  formatMoney,
-} from '../utils/travel';
+} from "../types/trip";
+import { CURRENCY_META, convertCurrency, formatMoney } from "../utils/travel";
 
 interface BudgetTrackerProps {
   displayCurrency: CurrencyCode;
@@ -28,12 +24,12 @@ interface BudgetTrackerProps {
   places: Place[];
   onChangeDisplayCurrency: (currency: CurrencyCode) => void;
   onUpdateCategoryLimit: (category: BudgetCategoryId, limitUsd: number) => void;
-  onAddExpense: (expense: Omit<ExpenseItem, 'id'>) => void;
+  onAddExpense: (expense: Omit<ExpenseItem, "id">) => void;
   onToggleExpensePaid: (expenseId: string) => void;
   onDeleteExpense: (expenseId: string) => void;
 }
 
-const CURRENCIES: CurrencyCode[] = ['USD', 'JPY', 'EUR', 'GBP', 'CAD'];
+const CURRENCIES: CurrencyCode[] = ["USD", "JPY", "EUR", "GBP", "CAD"];
 
 export function BudgetTracker({
   displayCurrency,
@@ -47,33 +43,36 @@ export function BudgetTracker({
   onToggleExpensePaid,
   onDeleteExpense,
 }: BudgetTrackerProps) {
-  const [filterCategory, setFilterCategory] = useState<BudgetCategoryId | 'all'>('all');
+  const [filterCategory, setFilterCategory] = useState<
+    BudgetCategoryId | "all"
+  >("all");
   const [hoveredCat, setHoveredCat] = useState<BudgetCategoryId | null>(null);
 
   // Add Expense form state
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState<BudgetCategoryId>('dining');
-  const [amount, setAmount] = useState('');
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState<BudgetCategoryId>("dining");
+  const [amount, setAmount] = useState("");
   const [currency, setCurrency] = useState<CurrencyCode>(displayCurrency);
-  const [dayId, setDayId] = useState<string>('');
+  const [dayId, setDayId] = useState<string>("");
   const [paid, setPaid] = useState(true);
 
   const totalBudgetDisplay = useMemo(
     () =>
       categoryBudgets.reduce(
-        (sum, b) => sum + convertCurrency(b.limitUsd, 'USD', displayCurrency),
-        0
+        (sum, b) => sum + convertCurrency(b.limitUsd, "USD", displayCurrency),
+        0,
       ),
-    [categoryBudgets, displayCurrency]
+    [categoryBudgets, displayCurrency],
   );
 
   const totalSpentDisplay = useMemo(
     () =>
       expenses.reduce(
-        (sum, e) => sum + convertCurrency(e.amount, e.currency, displayCurrency),
-        0
+        (sum, e) =>
+          sum + convertCurrency(e.amount, e.currency, displayCurrency),
+        0,
       ),
-    [expenses, displayCurrency]
+    [expenses, displayCurrency],
   );
 
   const paidTotalDisplay = useMemo(
@@ -81,10 +80,11 @@ export function BudgetTracker({
       expenses
         .filter((e) => e.paid)
         .reduce(
-          (sum, e) => sum + convertCurrency(e.amount, e.currency, displayCurrency),
-          0
+          (sum, e) =>
+            sum + convertCurrency(e.amount, e.currency, displayCurrency),
+          0,
         ),
-    [expenses, displayCurrency]
+    [expenses, displayCurrency],
   );
 
   // Estimated itinerary stops cost (from scheduled stops across all days)
@@ -95,9 +95,9 @@ export function BudgetTracker({
       d.stops.forEach((s) => {
         const p = placeMap.get(s.placeId);
         if (p) usd += p.estimatedCostUsd;
-      })
+      }),
     );
-    return convertCurrency(usd, 'USD', displayCurrency);
+    return convertCurrency(usd, "USD", displayCurrency);
   }, [days, places, displayCurrency]);
 
   const remainingDisplay = totalBudgetDisplay - totalSpentDisplay;
@@ -106,19 +106,21 @@ export function BudgetTracker({
   // Per-category breakdown for chart & limits
   const categoryStats = useMemo(() => {
     return categoryBudgets.map((cb) => {
-      const budgetVal = convertCurrency(cb.limitUsd, 'USD', displayCurrency);
+      const budgetVal = convertCurrency(cb.limitUsd, "USD", displayCurrency);
       const catExpenses = expenses.filter((e) => e.category === cb.category);
       const paidVal = catExpenses
         .filter((e) => e.paid)
         .reduce(
-          (sum, e) => sum + convertCurrency(e.amount, e.currency, displayCurrency),
-          0
+          (sum, e) =>
+            sum + convertCurrency(e.amount, e.currency, displayCurrency),
+          0,
         );
       const plannedVal = catExpenses
         .filter((e) => !e.paid)
         .reduce(
-          (sum, e) => sum + convertCurrency(e.amount, e.currency, displayCurrency),
-          0
+          (sum, e) =>
+            sum + convertCurrency(e.amount, e.currency, displayCurrency),
+          0,
         );
       const actualTotal = paidVal + plannedVal;
       return {
@@ -135,13 +137,13 @@ export function BudgetTracker({
   const chartMaxVal = useMemo(() => {
     const maxFound = Math.max(
       10,
-      ...categoryStats.map((c) => Math.max(c.budgetVal, c.actualTotal))
+      ...categoryStats.map((c) => Math.max(c.budgetVal, c.actualTotal)),
     );
     return maxFound * 1.12;
   }, [categoryStats]);
 
   const filteredExpenses = useMemo(() => {
-    if (filterCategory === 'all') return expenses;
+    if (filterCategory === "all") return expenses;
     return expenses.filter((e) => e.category === filterCategory);
   }, [expenses, filterCategory]);
 
@@ -162,8 +164,8 @@ export function BudgetTracker({
         days[0]?.date ||
         new Date().toISOString().slice(0, 10),
     });
-    setTitle('');
-    setAmount('');
+    setTitle("");
+    setAmount("");
   };
 
   return (
@@ -175,7 +177,8 @@ export function BudgetTracker({
             Trip Budget & Multi-Currency Ledger
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Track category caps, log expenses in local currencies, and compare actual spend against budget.
+            Track category caps, log expenses in local currencies, and compare
+            actual spend against budget.
           </p>
         </div>
 
@@ -188,8 +191,8 @@ export function BudgetTracker({
                 onClick={() => onChangeDisplayCurrency(code)}
                 className={`rounded-md px-2.5 py-1 font-mono text-xs font-medium transition-colors ${
                   displayCurrency === code
-                    ? 'bg-teal-700 text-white dark:bg-teal-600'
-                    : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                    ? "bg-teal-700 text-white dark:bg-teal-600"
+                    : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
                 }`}
               >
                 {code}
@@ -204,7 +207,7 @@ export function BudgetTracker({
         <span className="font-semibold text-slate-800 dark:text-slate-200">
           Mock FX Rates (Base 1 USD):
         </span>
-        {CURRENCIES.filter((c) => c !== 'USD').map((code) => (
+        {CURRENCIES.filter((c) => c !== "USD").map((code) => (
           <span key={code} className="font-mono tabular-nums">
             {code} {CURRENCY_META[code].rateFromUsd}
           </span>
@@ -244,8 +247,8 @@ export function BudgetTracker({
           <div
             className={`mt-1.5 flex items-center gap-2 font-mono text-2xl font-semibold tabular-nums ${
               isOverBudget
-                ? 'text-rose-600 dark:text-rose-400'
-                : 'text-emerald-700 dark:text-emerald-400'
+                ? "text-rose-600 dark:text-rose-400"
+                : "text-emerald-700 dark:text-emerald-400"
             }`}
           >
             {isOverBudget ? (
@@ -253,10 +256,12 @@ export function BudgetTracker({
             ) : (
               <CheckCircle2 className="h-5 w-5 shrink-0" />
             )}
-            <span>{formatMoney(Math.abs(remainingDisplay), displayCurrency)}</span>
+            <span>
+              {formatMoney(Math.abs(remainingDisplay), displayCurrency)}
+            </span>
           </div>
           <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-            {isOverBudget ? 'Over total budget' : 'Under total budget'}
+            {isOverBudget ? "Over total budget" : "Under total budget"}
           </div>
         </div>
 
@@ -283,7 +288,8 @@ export function BudgetTracker({
                 Actual Spend vs. Budget by Category
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Solid bar shows logged spend (paid + planned) compared against category target.
+                Solid bar shows logged spend (paid + planned) compared against
+                category target.
               </p>
             </div>
             <div className="flex items-center gap-4 text-xs text-slate-600 dark:text-slate-300">
@@ -321,7 +327,7 @@ export function BudgetTracker({
                       x2="620"
                       y2={y}
                       className="stroke-slate-200 dark:stroke-slate-800"
-                      strokeDasharray={t === 0 ? undefined : '3 3'}
+                      strokeDasharray={t === 0 ? undefined : "3 3"}
                     />
                     <text
                       x="56"
@@ -341,8 +347,14 @@ export function BudgetTracker({
                 const xCenter = 76 + idx * groupWidth + groupWidth / 2;
                 const barW = 24;
 
-                const budgetH = Math.max(2, (cat.budgetVal / chartMaxVal) * 185);
-                const actualH = Math.max(2, (cat.actualTotal / chartMaxVal) * 185);
+                const budgetH = Math.max(
+                  2,
+                  (cat.budgetVal / chartMaxVal) * 185,
+                );
+                const actualH = Math.max(
+                  2,
+                  (cat.actualTotal / chartMaxVal) * 185,
+                );
 
                 const isHovered = hoveredCat === cat.category;
 
@@ -384,8 +396,8 @@ export function BudgetTracker({
                       rx={4}
                       className={
                         cat.over
-                          ? 'fill-rose-600 dark:fill-rose-500'
-                          : 'fill-teal-600 dark:fill-teal-500'
+                          ? "fill-rose-600 dark:fill-rose-500"
+                          : "fill-teal-600 dark:fill-teal-500"
                       }
                     />
 
@@ -396,7 +408,7 @@ export function BudgetTracker({
                       textAnchor="middle"
                       className="fill-slate-700 dark:fill-slate-300 text-[11px] font-medium"
                     >
-                      {cat.label.split(' ')[0]}
+                      {cat.label.split(" ")[0]}
                     </text>
 
                     {/* Numeric comparison under label */}
@@ -406,8 +418,8 @@ export function BudgetTracker({
                       textAnchor="middle"
                       className={`font-mono text-[10px] ${
                         cat.over
-                          ? 'fill-rose-600 dark:fill-rose-400 font-semibold'
-                          : 'fill-slate-500 dark:fill-slate-400'
+                          ? "fill-rose-600 dark:fill-rose-400 font-semibold"
+                          : "fill-slate-500 dark:fill-slate-400"
                       }`}
                     >
                       {formatMoney(cat.actualTotal, displayCurrency)}
@@ -425,14 +437,18 @@ export function BudgetTracker({
             Category Allocations
           </h2>
           <p className="mt-0.5 mb-4 text-xs text-slate-500 dark:text-slate-400">
-            Adjust target budgets in {displayCurrency}; progress bars update immediately.
+            Adjust target budgets in {displayCurrency}; progress bars update
+            immediately.
           </p>
 
           <div className="space-y-4">
             {categoryStats.map((cat) => {
               const pct =
                 cat.budgetVal > 0
-                  ? Math.min(100, Math.round((cat.actualTotal / cat.budgetVal) * 100))
+                  ? Math.min(
+                      100,
+                      Math.round((cat.actualTotal / cat.budgetVal) * 100),
+                    )
                   : 0;
               return (
                 <div key={cat.category} className="space-y-1.5">
@@ -444,8 +460,8 @@ export function BudgetTracker({
                       <span
                         className={
                           cat.over
-                            ? 'font-semibold text-rose-600 dark:text-rose-400'
-                            : 'text-slate-600 dark:text-slate-300'
+                            ? "font-semibold text-rose-600 dark:text-rose-400"
+                            : "text-slate-600 dark:text-slate-300"
                         }
                       >
                         {formatMoney(cat.actualTotal, displayCurrency)}
@@ -458,14 +474,17 @@ export function BudgetTracker({
                         <input
                           type="number"
                           min={0}
-                          step={displayCurrency === 'JPY' ? 1000 : 10}
+                          step={displayCurrency === "JPY" ? 1000 : 10}
                           value={Math.round(cat.budgetVal)}
                           onChange={(e) => {
-                            const valInDisplay = Math.max(0, Number(e.target.value) || 0);
+                            const valInDisplay = Math.max(
+                              0,
+                              Number(e.target.value) || 0,
+                            );
                             const valUsd = convertCurrency(
                               valInDisplay,
                               displayCurrency,
-                              'USD'
+                              "USD",
                             );
                             onUpdateCategoryLimit(cat.category, valUsd);
                           }}
@@ -479,8 +498,8 @@ export function BudgetTracker({
                     <div
                       className={`h-full rounded-full transition-all duration-200 ${
                         cat.over
-                          ? 'bg-rose-600 dark:bg-rose-500'
-                          : 'bg-teal-600 dark:bg-teal-500'
+                          ? "bg-rose-600 dark:bg-rose-500"
+                          : "bg-teal-600 dark:bg-teal-500"
                       }`}
                       style={{ width: `${pct}%` }}
                     />
@@ -503,11 +522,11 @@ export function BudgetTracker({
             <div className="flex flex-wrap items-center gap-1 rounded-lg bg-slate-100 p-1 dark:bg-slate-800">
               <button
                 type="button"
-                onClick={() => setFilterCategory('all')}
+                onClick={() => setFilterCategory("all")}
                 className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
-                  filterCategory === 'all'
-                    ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-slate-100'
-                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400'
+                  filterCategory === "all"
+                    ? "bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-slate-100"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400"
                 }`}
               >
                 All
@@ -519,11 +538,11 @@ export function BudgetTracker({
                   onClick={() => setFilterCategory(cb.category)}
                   className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                     filterCategory === cb.category
-                      ? 'bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-slate-100'
-                      : 'text-slate-600 hover:text-slate-900 dark:text-slate-400'
+                      ? "bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-slate-100"
+                      : "text-slate-600 hover:text-slate-900 dark:text-slate-400"
                   }`}
                 >
-                  {cb.label.split(' ')[0]}
+                  {cb.label.split(" ")[0]}
                 </button>
               ))}
             </div>
@@ -619,10 +638,12 @@ export function BudgetTracker({
           <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
             <Receipt className="h-8 w-8 text-slate-400 mb-2" />
             <p className="text-sm font-medium text-slate-700 dark:text-slate-200">
-              No expenses logged{filterCategory !== 'all' ? ' in this category' : ' yet'}
+              No expenses logged
+              {filterCategory !== "all" ? " in this category" : " yet"}
             </p>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              Use the form above to record hotels, meals, rail passes, or tickets in any currency.
+              Use the form above to record hotels, meals, rail passes, or
+              tickets in any currency.
             </p>
           </div>
         ) : (
@@ -633,7 +654,9 @@ export function BudgetTracker({
                   <th className="px-4 py-2.5 font-medium">Item</th>
                   <th className="px-4 py-2.5 font-medium">Category</th>
                   <th className="px-4 py-2.5 font-medium">Status</th>
-                  <th className="px-4 py-2.5 font-medium text-right">Original</th>
+                  <th className="px-4 py-2.5 font-medium text-right">
+                    Original
+                  </th>
                   <th className="px-4 py-2.5 font-medium text-right">
                     Converted ({displayCurrency})
                   </th>
@@ -643,12 +666,12 @@ export function BudgetTracker({
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
                 {filteredExpenses.map((exp) => {
                   const catLabel =
-                    categoryBudgets.find((c) => c.category === exp.category)?.label ||
-                    exp.category;
+                    categoryBudgets.find((c) => c.category === exp.category)
+                      ?.label || exp.category;
                   const converted = convertCurrency(
                     exp.amount,
                     exp.currency,
-                    displayCurrency
+                    displayCurrency,
                   );
                   const dayIdx = days.findIndex((d) => d.id === exp.dayId);
                   return (
@@ -675,16 +698,18 @@ export function BudgetTracker({
                           onClick={() => onToggleExpensePaid(exp.id)}
                           className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-[11px] font-medium transition-colors ${
                             exp.paid
-                              ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
-                              : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300'
+                              ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300"
+                              : "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300"
                           }`}
                         >
-                          {exp.paid ? 'Paid' : 'Planned'}
+                          {exp.paid ? "Paid" : "Planned"}
                         </button>
                       </td>
                       <td className="px-4 py-3 text-right font-mono tabular-nums text-slate-600 dark:text-slate-300">
-                        {formatMoney(exp.amount, exp.currency)}{' '}
-                        <span className="text-[10px] text-slate-400">{exp.currency}</span>
+                        {formatMoney(exp.amount, exp.currency)}{" "}
+                        <span className="text-[10px] text-slate-400">
+                          {exp.currency}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-right font-mono font-semibold tabular-nums text-slate-900 dark:text-slate-100">
                         {formatMoney(converted, displayCurrency)}

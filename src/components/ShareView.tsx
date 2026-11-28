@@ -1,11 +1,6 @@
-import { useMemo, useState } from 'react';
-import {
-  Copy,
-  Edit3,
-  Printer,
-  Share2,
-} from 'lucide-react';
-import { TripData } from '../types/trip';
+import { useMemo, useState } from "react";
+import { Copy, Edit3, Printer, Share2 } from "lucide-react";
+import { TripData } from "../types/trip";
 import {
   CATEGORY_META,
   addDaysToIsoDate,
@@ -17,8 +12,8 @@ import {
   formatShortDate,
   haversineKm,
   parseTimeToMinutes,
-} from '../utils/travel';
-import { MapCanvas } from './MapCanvas';
+} from "../utils/travel";
+import { MapCanvas } from "./MapCanvas";
 
 interface ShareViewProps {
   trip: TripData;
@@ -40,13 +35,13 @@ export function ShareView({
   onForkSharedTrip,
 }: ShareViewProps) {
   const [selectedDayId, setSelectedDayId] = useState<string | null>(
-    trip.days[0]?.id || null
+    trip.days[0]?.id || null,
   );
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(null);
 
   const placeMap = useMemo(
     () => new Map(trip.places.map((p) => [p.id, p])),
-    [trip.places]
+    [trip.places],
   );
 
   const endDate =
@@ -56,25 +51,27 @@ export function ShareView({
 
   const totalStops = useMemo(
     () => trip.days.reduce((sum, d) => sum + d.stops.length, 0),
-    [trip.days]
+    [trip.days],
   );
 
   const totalBudgetDisplay = useMemo(
     () =>
       trip.categoryBudgets.reduce(
-        (sum, c) => sum + convertCurrency(c.limitUsd, 'USD', trip.displayCurrency),
-        0
+        (sum, c) =>
+          sum + convertCurrency(c.limitUsd, "USD", trip.displayCurrency),
+        0,
       ),
-    [trip.categoryBudgets, trip.displayCurrency]
+    [trip.categoryBudgets, trip.displayCurrency],
   );
 
   const totalLoggedDisplay = useMemo(
     () =>
       trip.expenses.reduce(
-        (sum, e) => sum + convertCurrency(e.amount, e.currency, trip.displayCurrency),
-        0
+        (sum, e) =>
+          sum + convertCurrency(e.amount, e.currency, trip.displayCurrency),
+        0,
       ),
-    [trip.expenses, trip.displayCurrency]
+    [trip.expenses, trip.displayCurrency],
   );
 
   return (
@@ -84,7 +81,9 @@ export function ShareView({
         <div className="flex items-center gap-2.5 text-xs text-teal-900 dark:text-teal-200">
           <Share2 className="h-4 w-4 shrink-0 text-teal-700 dark:text-teal-400" />
           <span>
-            <strong className="font-semibold">Read-Only Share View</strong> — Anyone with this link can inspect the route, schedule, and budget without modifying your plan.
+            <strong className="font-semibold">Read-Only Share View</strong> —
+            Anyone with this link can inspect the route, schedule, and budget
+            without modifying your plan.
           </span>
         </div>
 
@@ -135,7 +134,7 @@ export function ShareView({
           <div>
             <div className="text-xs font-medium text-teal-700 dark:text-teal-400">
               {trip.destination} · {formatShortDate(trip.startDate)}
-              {trip.days.length > 1 ? ` – ${formatShortDate(endDate)}` : ''}
+              {trip.days.length > 1 ? ` – ${formatShortDate(endDate)}` : ""}
             </div>
             <h1 className="mt-1 font-display text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
               {trip.title}
@@ -146,7 +145,7 @@ export function ShareView({
             <div>
               <div>Duration</div>
               <div className="mt-0.5 font-mono text-sm font-semibold tabular-nums text-slate-900 dark:text-slate-100">
-                {trip.days.length} {trip.days.length === 1 ? 'day' : 'days'}
+                {trip.days.length} {trip.days.length === 1 ? "day" : "days"}
               </div>
             </div>
             <div>
@@ -164,7 +163,7 @@ export function ShareView({
             <div>
               <div>Logged / Budget</div>
               <div className="mt-0.5 font-mono text-sm font-semibold tabular-nums text-slate-900 dark:text-slate-100">
-                {formatMoney(totalLoggedDisplay, trip.displayCurrency)} /{' '}
+                {formatMoney(totalLoggedDisplay, trip.displayCurrency)} /{" "}
                 {formatMoney(totalBudgetDisplay, trip.displayCurrency)}
               </div>
             </div>
@@ -185,8 +184,8 @@ export function ShareView({
               onClick={() => setSelectedDayId(null)}
               className={`rounded-md px-2.5 py-1 text-xs font-medium ${
                 selectedDayId === null
-                  ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900'
-                  : 'text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800'
+                  ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
+                  : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
               }`}
             >
               All Days
@@ -206,8 +205,8 @@ export function ShareView({
                   key={day.id}
                   className={`rounded-xl border bg-white p-4 dark:bg-slate-900 transition-colors ${
                     isSelected
-                      ? 'border-teal-600/60 dark:border-teal-500/60'
-                      : 'border-slate-200 dark:border-slate-800'
+                      ? "border-teal-600/60 dark:border-teal-500/60"
+                      : "border-slate-200 dark:border-slate-800"
                   }`}
                 >
                   <button
@@ -230,7 +229,9 @@ export function ShareView({
 
                   <div className="mt-3 space-y-2">
                     {day.stops.length === 0 ? (
-                      <p className="text-xs text-slate-400">No stops scheduled.</p>
+                      <p className="text-xs text-slate-400">
+                        No stops scheduled.
+                      </p>
                     ) : (
                       day.stops.map((stop, sIdx) => {
                         const place = placeMap.get(stop.placeId);
@@ -250,9 +251,12 @@ export function ShareView({
                             place.lat,
                             place.lng,
                             nextPlace.lat,
-                            nextPlace.lng
+                            nextPlace.lng,
                           );
-                          legMin = estimateTravelMinutes(legKm, stop.travelModeToNext);
+                          legMin = estimateTravelMinutes(
+                            legKm,
+                            stop.travelModeToNext,
+                          );
                         }
                         cursor = endMin + legMin;
 
@@ -284,7 +288,8 @@ export function ShareView({
                                   </span>
                                 </div>
                                 <div className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">
-                                  {meta.label} · {place.neighborhood} · {stop.durationMinutes} min
+                                  {meta.label} · {place.neighborhood} ·{" "}
+                                  {stop.durationMinutes} min
                                 </div>
                                 {stop.note && (
                                   <p className="mt-1 text-[11px] text-slate-600 dark:text-slate-300">
@@ -298,7 +303,8 @@ export function ShareView({
                               <div className="ml-8 my-1 flex items-center gap-2 text-[11px] text-slate-400 font-mono tabular-nums">
                                 <span>↓</span>
                                 <span>
-                                  ~{legMin} min {stop.travelModeToNext} ({formatDistance(legKm)})
+                                  ~{legMin} min {stop.travelModeToNext} (
+                                  {formatDistance(legKm)})
                                 </span>
                               </div>
                             )}

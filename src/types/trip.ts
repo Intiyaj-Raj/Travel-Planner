@@ -1,23 +1,23 @@
 export type PlaceCategory =
-  | 'landmark'
-  | 'dining'
-  | 'culture'
-  | 'nature'
-  | 'transit'
-  | 'stay';
+  | "landmark"
+  | "dining"
+  | "culture"
+  | "nature"
+  | "transit"
+  | "stay";
 
-export type TravelMode = 'walk' | 'transit' | 'taxi';
+export type TravelMode = "walk" | "transit" | "taxi";
 
-export type CurrencyCode = 'USD' | 'JPY' | 'EUR' | 'GBP' | 'CAD';
+export type CurrencyCode = "USD" | "JPY" | "EUR" | "GBP" | "CAD";
 
 export type BudgetCategoryId =
-  | 'accommodation'
-  | 'dining'
-  | 'activities'
-  | 'transit'
-  | 'shopping';
+  | "accommodation"
+  | "dining"
+  | "activities"
+  | "transit"
+  | "shopping";
 
-export type AppView = 'itinerary' | 'budget' | 'packing' | 'share';
+export type AppView = "itinerary" | "budget" | "packing" | "share";
 
 export interface Place {
   id: string;
@@ -95,7 +95,7 @@ export interface PackingTemplate {
   id: string;
   name: string;
   description: string;
-  groups: Omit<PackingGroup, 'id'>[];
+  groups: Omit<PackingGroup, "id">[];
 }
 
 export interface TripData {

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState } from "react";
 import {
   Calendar,
   Download,
@@ -10,9 +10,9 @@ import {
   Share2,
   Sun,
   Upload,
-} from 'lucide-react';
-import { AppView, TripData } from '../types/trip';
-import { formatShortDate, addDaysToIsoDate } from '../utils/travel';
+} from "lucide-react";
+import { AppView, TripData } from "../types/trip";
+import { formatShortDate, addDaysToIsoDate } from "../utils/travel";
 
 interface TopBarProps {
   activeView: AppView;
@@ -59,10 +59,10 @@ export function TopBar({
       : addDaysToIsoDate(trip.startDate, 0);
 
   const allNavItems: { id: AppView; label: string }[] = [
-    { id: 'itinerary', label: 'Itinerary' },
-    { id: 'budget', label: 'Budget' },
-    { id: 'packing', label: 'Packing' },
-    { id: 'share', label: 'Share View' },
+    { id: "itinerary", label: "Itinerary" },
+    { id: "budget", label: "Budget" },
+    { id: "packing", label: "Packing" },
+    { id: "share", label: "Share View" },
   ];
   const navItems = enabledViews
     ? allNavItems.filter((item) => enabledViews.includes(item.id))
@@ -70,13 +70,13 @@ export function TopBar({
 
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>,
-    handler: (file: File) => void
+    handler: (file: File) => void,
   ) => {
     const file = e.target.files?.[0];
     if (file) {
       handler(file);
     }
-    e.target.value = '';
+    e.target.value = "";
     setDataMenuOpen(false);
   };
 
@@ -87,7 +87,7 @@ export function TopBar({
         {/* Zone 1: Single-element brand wordmark */}
         <button
           type="button"
-          onClick={() => onNavigate('itinerary')}
+          onClick={() => onNavigate("itinerary")}
           className="font-display text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100 whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 rounded"
         >
           Wayfinder
@@ -107,8 +107,8 @@ export function TopBar({
                 onClick={() => onNavigate(item.id)}
                 className={`relative py-4 text-sm font-medium transition-colors whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 ${
                   isActive
-                    ? 'text-teal-700 dark:text-teal-400'
-                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100'
+                    ? "text-teal-700 dark:text-teal-400"
+                    : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100"
                 }`}
               >
                 {item.label}
@@ -135,7 +135,7 @@ export function TopBar({
       </header>
 
       {/* Workspace Sub-Toolbar (hidden in Read-Only Share View) */}
-      {activeView !== 'share' && (
+      {activeView !== "share" && (
         <div className="border-t border-slate-100 bg-white dark:border-slate-800/80 dark:bg-slate-950/60">
           <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-2">
             {/* Left: Active trip summary & quick metadata edit */}
@@ -150,9 +150,11 @@ export function TopBar({
                 </span>
                 <span className="hidden md:inline text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
                   {trip.destination} · {formatShortDate(trip.startDate)}
-                  {trip.days.length > 1 ? ` – ${formatShortDate(endDate)}` : ''} ·{' '}
-                  <span className="tabular-nums">{trip.travelers}</span>{' '}
-                  {trip.travelers === 1 ? 'traveler' : 'travelers'}
+                  {trip.days.length > 1
+                    ? ` – ${formatShortDate(endDate)}`
+                    : ""}{" "}
+                  · <span className="tabular-nums">{trip.travelers}</span>{" "}
+                  {trip.travelers === 1 ? "traveler" : "travelers"}
                 </span>
                 <Settings2 className="h-3.5 w-3.5 text-slate-400 group-hover:text-teal-700 dark:group-hover:text-teal-400 shrink-0" />
               </button>
@@ -284,10 +286,16 @@ export function TopBar({
               <button
                 type="button"
                 onClick={onToggleDarkMode}
-                aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                aria-label={
+                  darkMode ? "Switch to light mode" : "Switch to dark mode"
+                }
                 className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors shrink-0"
               >
-                {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                {darkMode ? (
+                  <Sun className="h-4 w-4" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
               </button>
             </div>
           </div>

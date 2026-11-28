@@ -3,25 +3,31 @@
 
 @layer base {
   :root {
-    --font-display: 'Outfit', system-ui, sans-serif;
-    --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
-    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --font-display: "Outfit", system-ui, sans-serif;
+    --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
   }
 
-  html, body {
+  html,
+  body {
     font-family: var(--font-sans);
     background-color: #ffffff;
   }
 
-  html.dark, html.dark body {
+  html.dark,
+  html.dark body {
     background-color: #020617;
   }
 
-  h1, h2, h3, .font-display {
+  h1,
+  h2,
+  h3,
+  .font-display {
     font-family: var(--font-display);
   }
 
-  .font-mono, .tabular-nums {
+  .font-mono,
+  .tabular-nums {
     font-variant-numeric: tabular-nums;
   }
 }
@@ -82,7 +88,8 @@
     size: auto;
   }
 
-  html, body {
+  html,
+  body {
     background: #ffffff !important;
     color: #0f172a !important;
     font-size: 11pt;

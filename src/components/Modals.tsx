@@ -1,26 +1,37 @@
-import React, { useState } from 'react';
-import { X } from 'lucide-react';
-import { CurrencyCode, Place, PlaceCategory, TripData } from '../types/trip';
-import { CATEGORY_META } from '../utils/travel';
+import React, { useState } from "react";
+import { X } from "lucide-react";
+import { CurrencyCode, Place, PlaceCategory, TripData } from "../types/trip";
+import { CATEGORY_META } from "../utils/travel";
 
 interface TripSettingsModalProps {
   trip: TripData;
-  onSave: (patch: Pick<TripData, 'title' | 'destination' | 'startDate' | 'travelers' | 'displayCurrency'>) => void;
+  onSave: (
+    patch: Pick<
+      TripData,
+      "title" | "destination" | "startDate" | "travelers" | "displayCurrency"
+    >,
+  ) => void;
   onClose: () => void;
 }
 
-export function TripSettingsModal({ trip, onSave, onClose }: TripSettingsModalProps) {
+export function TripSettingsModal({
+  trip,
+  onSave,
+  onClose,
+}: TripSettingsModalProps) {
   const [title, setTitle] = useState(trip.title);
   const [destination, setDestination] = useState(trip.destination);
   const [startDate, setStartDate] = useState(trip.startDate);
   const [travelers, setTravelers] = useState(trip.travelers);
-  const [displayCurrency, setDisplayCurrency] = useState<CurrencyCode>(trip.displayCurrency);
+  const [displayCurrency, setDisplayCurrency] = useState<CurrencyCode>(
+    trip.displayCurrency,
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave({
-      title: title.trim() || 'Untitled Trip',
-      destination: destination.trim() || 'Custom Destination',
+      title: title.trim() || "Untitled Trip",
+      destination: destination.trim() || "Custom Destination",
       startDate,
       travelers: Math.max(1, travelers),
       displayCurrency,
@@ -109,14 +120,18 @@ export function TripSettingsModal({ trip, onSave, onClose }: TripSettingsModalPr
               </label>
               <select
                 value={displayCurrency}
-                onChange={(e) => setDisplayCurrency(e.target.value as CurrencyCode)}
+                onChange={(e) =>
+                  setDisplayCurrency(e.target.value as CurrencyCode)
+                }
                 className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50 px-2 font-mono text-slate-900 focus:border-teal-600 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
               >
-                {(['USD', 'JPY', 'EUR', 'GBP', 'CAD'] as CurrencyCode[]).map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
+                {(["USD", "JPY", "EUR", "GBP", "CAD"] as CurrencyCode[]).map(
+                  (c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ),
+                )}
               </select>
             </div>
           </div>
@@ -144,20 +159,24 @@ export function TripSettingsModal({ trip, onSave, onClose }: TripSettingsModalPr
 
 interface AddPlaceModalProps {
   initialCoords?: { lat: number; lng: number } | null;
-  onAddPlace: (place: Omit<Place, 'id'>) => void;
+  onAddPlace: (place: Omit<Place, "id">) => void;
   onClose: () => void;
 }
 
-export function AddPlaceModal({ initialCoords, onAddPlace, onClose }: AddPlaceModalProps) {
-  const [name, setName] = useState('');
-  const [category, setCategory] = useState<PlaceCategory>('landmark');
-  const [neighborhood, setNeighborhood] = useState('Central Kyoto');
-  const [address, setAddress] = useState('');
+export function AddPlaceModal({
+  initialCoords,
+  onAddPlace,
+  onClose,
+}: AddPlaceModalProps) {
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState<PlaceCategory>("landmark");
+  const [neighborhood, setNeighborhood] = useState("Central Kyoto");
+  const [address, setAddress] = useState("");
   const [lat, setLat] = useState(String(initialCoords?.lat ?? 35.0085));
   const [lng, setLng] = useState(String(initialCoords?.lng ?? 135.7681));
   const [durationMinutes, setDurationMinutes] = useState(60);
   const [estimatedCostUsd, setEstimatedCostUsd] = useState(10);
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -167,15 +186,15 @@ export function AddPlaceModal({ initialCoords, onAddPlace, onClose }: AddPlaceMo
     onAddPlace({
       name: name.trim(),
       category,
-      neighborhood: neighborhood.trim() || 'Custom Area',
-      address: address.trim() || neighborhood.trim() || 'Custom Location',
+      neighborhood: neighborhood.trim() || "Custom Area",
+      address: address.trim() || neighborhood.trim() || "Custom Location",
       lat: Number.isNaN(parsedLat) ? 35.0085 : parsedLat,
       lng: Number.isNaN(parsedLng) ? 135.7681 : parsedLng,
       durationMinutes: Math.max(15, durationMinutes),
       estimatedCostUsd: Math.max(0, estimatedCostUsd),
       rating: 4.8,
-      hours: '09:00 – 18:00',
-      description: description.trim() || 'Custom traveler-pinned location.',
+      hours: "09:00 – 18:00",
+      description: description.trim() || "Custom traveler-pinned location.",
       saved: true,
       isCustom: true,
     });
@@ -284,7 +303,9 @@ export function AddPlaceModal({ initialCoords, onAddPlace, onClose }: AddPlaceMo
                 min={15}
                 step={5}
                 value={durationMinutes}
-                onChange={(e) => setDurationMinutes(Number(e.target.value) || 60)}
+                onChange={(e) =>
+                  setDurationMinutes(Number(e.target.value) || 60)
+                }
                 className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 font-mono text-slate-900 focus:border-teal-600 focus:bg-white focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
               />
             </div>
@@ -296,7 +317,9 @@ export function AddPlaceModal({ initialCoords, onAddPlace, onClose }: AddPlaceMo
                 type="number"
                 min={0}
                 value={estimatedCostUsd}
-                onChange={(e) => setEstimatedCostUsd(Number(e.target.value) || 0)}
+                onChange={(e) =>
+                  setEstimatedCostUsd(Number(e.target.value) || 0)
+                }
                 className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50 px-2.5 font-mono text-slate-900 focus:border-teal-600 focus:bg-white focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
               />
             </div>
